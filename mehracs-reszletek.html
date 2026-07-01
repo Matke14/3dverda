@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Méhrács — elülső — 3DVerda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#110d0c;
+    --bg-raised:#1b1413;
+    --bg-raised-2:#241a18;
+    --red:#c41e2a;
+    --red-bright:#e6394a;
+    --steel:#9aa0a6;
+    --steel-dim:#736e6c;
+    --cream:#f3ede3;
+    --copper:#d98a4a;
+    --line: rgba(243,237,227,0.09);
+    --line-strong: rgba(243,237,227,0.16);
+    --maxw: 1180px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--cream);
+    font-family:"IBM Plex Sans", sans-serif; padding-top: 60px;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:40px 28px;}
+  
+  /* Vissza gomb */
+  .back-btn{
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--steel); text-decoration: none; font-family: "IBM Plex Mono", monospace;
+    font-size: 14px; margin-bottom: 30px; transition: color .2s;
+  }
+  .back-btn:hover{color: var(--cream);}
+
+  /* Termék elrendezés GRID */
+  .product-container{
+    display: grid; grid-template-columns: 1fr 1fr; gap: 50px;
+  }
+
+  /* Galéria */
+  .gallery-container{ display: flex; flex-direction: column; gap: 16px; }
+  
+  /* Főkép nagyító doboz */
+  .main-img-box{
+    position: relative; overflow: hidden;
+    background: var(--bg-raised); border: 1px solid var(--line-strong);
+    aspect-ratio: 4/3; cursor: zoom-in;
+  }
+  .main-img-box img{
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  /* JavaScript adja hozzá a nagyításhoz */
+  .main-img-box:hover img {
+    transform: scale(1.5);
+  }
+
+  /* Kisképek sora */
+  .thumb-row{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .thumb-box{
+    border: 1px solid var(--line); background: var(--bg-raised);
+    aspect-ratio: 4/3; cursor: pointer; transition: border-color .2s;
+    overflow: hidden;
+  }
+  .thumb-box img{ width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: opacity .2s; }
+  .thumb-box:hover img, .thumb-box.active img{ opacity: 1; }
+  .thumb-box.active{ border-color: var(--red-bright); }
+
+  /* Infó oldal */
+  h1{ font-family: "Oswald", sans-serif; font-size: 42px; text-transform: uppercase; margin: 0 0 10px 0; }
+  .price{ font-family: "IBM Plex Mono", monospace; font-size: 24px; color: var(--copper); margin-bottom: 24px; }
+  .specs-box{
+    background: var(--bg-raised); border: 1px solid var(--line);
+    padding: 20px; margin: 24px 0;
+  }
+  .spec-item{
+    display: flex; justify-content: space-between; padding: 8px 0;
+    border-bottom: 1px solid var(--line); font-family: "IBM Plex Mono", monospace; font-size: 14px;
+  }
+  .spec-item:last-child{ border-bottom: none; }
+  .spec-item span:first-child{ color: var(--steel-dim); }
+  
+  .desc{ color: var(--steel); line-height: 1.7; margin-bottom: 30px; }
+
+  /* CTA Gomb az űrlaphoz */
+  .order-btn{
+    display: inline-block; padding: 16px 40px; background: var(--red);
+    color: var(--cream); text-decoration: none; font-family: "IBM Plex Mono", monospace;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    transition: background .2s, transform .2s; border: none; cursor: pointer;
+  }
+  .order-btn:hover{ background: #6e0f17; transform: translateY(-2px); }
+
+  @media(max-width: 768px){
+    .product-container{ grid-template-columns: 1fr; gap: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a href="index.html#alkatreszek" class="back-btn">← Vissza a termékekhez</a>
+
+  <div class="product-container">
+    
+    <div class="gallery-container">
+      <div class="main-img-box" id="mainImgBox">
+        <img src="kep.jpg" id="mainImage" alt="Főkép">
+      </div>
+      <div class="thumb-row">
+        <div class="thumb-box active" onclick="changeImage('kep.jpg', this)"><img src="kep.jpg" alt="Kép 1"></div>
+        <div class="thumb-box" onclick="changeImage('kep2.jpg', this)"><img src="kep2.jpg" alt="Kép 2"></div>
+        <div class="thumb-box" onclick="changeImage('kep3.jpg', this)"><img src="kep3.jpg" alt="Kép 3"></div>
+      </div>
+    </div>
+
+    <div>
+      <h1>Méhrács — elülső</h1>
+      <div class="price">7 900 Ft</div>
+      
+      <p class="desc">
+        Prémium minőségű, hő- és UV-álló alapanyagból készült elülső méhrács kifejezetten Alfa Romeo modellekhez. A gyári rácsok mintájára tervezve, de megerősített tartószerkezettel a hosszabb élettartamért. Roncsolásmentesen beépíthető a gyári rögzítési pontokra.
+      </p>
+
+      <div class="specs-box">
+        <div class="spec-item"><span>Technológia</span><span>FDM 3D Nyomtatás</span></div>
+        <div class="spec-item"><span>Anyag</span><span>PETG / ASA (Hőálló)</span></div>
+        <div class="spec-item"><span>Kompatibilitás</span><span>Alfa Romeo (Egyeztetés szerint)</span></div>
+        <div class="spec-item"><span>Gyártási idő</span><span>2-3 munkanap</span></div>
+      </div>
+
+      <a href="index.html#kapcsolat" class="order-btn">Érdekel, írok nektek →</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Kisképre kattintás kezelése
+  function changeImage(src, thumb) {
+    document.getElementById('mainImage').src = src;
+    
+    // Aktív osztály kezelése a kisképeken
+    document.querySelectorAll('.thumb-box').forEach(box => box.classList.remove('active'));
+    thumb.classList.add('active');
+  }
+
+  // Egérkövető nagyítás (Zoom) effekt a főképen
+  const box = document.getElementById('mainImgBox');
+  const img = document.getElementById('mainImage');
+
+  box.addEventListener('mousemove', (e) => {
+    const x = e.clientX - box.offsetLeft;
+    const y = e.clientY - box.offsetTop;
+    
+    img.style.transformOrigin = `${(x / box.offsetWidth) * 100}% ${(y / box.offsetHeight) * 100}%`;
+  });
+
+  box.addEventListener('mouseleave', () => {
+    img.style.transformOrigin = 'center center';
+  });
+</script>
+
+</body>
+</html>
