@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3DVerda — Egyedi, 3D nyomtatott autós kiegészítők</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#110d0c;
+    --bg-raised:#1b1413;
+    --bg-raised-2:#241a18;
+    --red:#c41e2a;
+    --red-deep:#6e0f17;
+    --red-bright:#e6394a;
+    --steel:#9aa0a6;
+    --steel-dim:#736e6c;
+    --cream:#f3ede3;
+    --copper:#d98a4a;
+    --line: rgba(243,237,227,0.09);
+    --line-strong: rgba(243,237,227,0.16);
+    --maxw: 1180px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--cream);
+    font-family:"IBM Plex Sans", system-ui, sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;display:block;height:auto;}
+  a{color:inherit;}
+  h1,h2,h3{
+    font-family:"Oswald", sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.01em;
+    margin:0;
+    font-weight:600;
+  }
+  .mono{font-family:"IBM Plex Mono", monospace;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+  .eyebrow{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:12.5px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--copper);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px;height:1px;
+    background:var(--copper);
+    display:inline-block;
+  }
+  .reveal{opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s ease;}
+  .reveal.is-visible{opacity:1; transform:translateY(0);}
+
+  .layerlines{
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--line) 0px, var(--line) 1px,
+      transparent 1px, transparent 7px
+    );
+  }
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    padding:20px 0;
+    transition: padding .3s ease, background .3s ease, border-color .3s ease;
+    border-bottom:1px solid transparent;
+  }
+  header.nav.scrolled{
+    padding:13px 0;
+    background:rgba(17,13,12,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{
+    font-family:"Oswald", sans-serif;
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:0.04em;
+    text-decoration:none;
+    color:var(--cream);
+    display:flex; align-items:center; gap:9px;
+  }
+  .logo span{color:var(--red-bright);}
+  .logo-mark{
+    width:11px; height:11px;
+    background:var(--red);
+    transform:rotate(45deg);
+    flex:none;
+  }
+  nav.links{
+    display:flex; gap:34px;
+    font-size:14px;
+    letter-spacing:0.03em;
+  }
+  nav.links a{
+    text-decoration:none;
+    color:var(--steel);
+    position:relative;
+    padding-bottom:4px;
+    transition:color .2s ease;
+  }
+  nav.links a:hover{color:var(--cream);}
+  nav.links a::after{
+    content:"";
+    position:absolute; left:0; bottom:0;
+    width:0; height:1px;
+    background:var(--red-bright);
+    transition:width .25s ease;
+  }
+  nav.links a:hover::after{width:100%;}
+  .burger{display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:4px;}
+  .burger span{width:24px; height:2px; background:var(--cream); transition: transform 0.3s, opacity 0.3s;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex; align-items:center;
+    padding-top:90px;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(196,30,42,0.18), transparent 60%),
+      var(--bg);
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(ellipse 75% 65% at 50% 40%, black 35%, transparent 80%);
+    opacity:0.8;
+  }
+  .hero-inner{
+    position:relative; z-index:2;
+    display:grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap:50px;
+    align-items:center;
+    width:100%;
+  }
+  .hero-kicker{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:13px;
+    letter-spacing:0.18em;
+    color:var(--steel);
+    margin-bottom:22px;
+  }
+  .hero-kicker em{color:var(--red-bright); font-style:normal;}
+  h1.hero-title{
+    font-size:clamp(48px, 8vw, 88px);
+    line-height:0.95;
+    color:var(--cream);
+  }
+  h1.hero-title .accent{color:var(--red-bright);}
+  .hero-motto{
+    font-family:"Oswald", sans-serif;
+    font-size:clamp(18px, 2.1vw, 23px);
+    color:var(--copper);
+    text-transform:none;
+    margin-top:18px;
+    letter-spacing:0.01em;
+  }
+  .hero-desc{
+    max-width:460px;
+    color:var(--steel);
+    font-size:15.5px;
+    margin-top:18px;
+  }
+  .hero-cta{
+    display:inline-flex; align-items:center; gap:10px;
+    margin-top:34px;
+    padding:14px 26px;
+    background:var(--red);
+    color:var(--cream);
+    text-decoration:none;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:13.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    border:1px solid var(--red);
+    transition:background .2s ease, transform .2s ease;
+  }
+  .hero-cta:hover{background:var(--red-deep); transform:translateY(-1px);}
+
+  .hero-visual{position:relative;}
+  .hero-visual-frame{
+    position:relative;
+    border:1px solid var(--line-strong);
+    background:var(--bg-raised);
+    padding:18px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+  }
+  .hero-visual-frame::before{
+    content:"";
+    position:absolute; top:-1px; left:-1px;
+    width:26px; height:26px;
+    border-top:2px solid var(--red-bright);
+    border-left:2px solid var(--red-bright);
+  }
+  .hero-visual-frame::after{
+    content:"";
+    position:absolute; bottom:-1px; right:-1px;
+    width:26px; height:26px;
+    border-bottom:2px solid var(--red-bright);
+    border-right:2px solid var(--red-bright);
+  }
+  .hero-visual img{width:100%; display:block;}
+  .hero-visual-cap{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:11.5px;
+    color:var(--steel-dim);
+    letter-spacing:0.05em;
+    margin-top:12px;
+    display:flex; justify-content:space-between;
+  }
+
+  .scroll-cue{
+    position:absolute; left:50%; bottom:28px; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    color:var(--steel-dim);
+    font-family:"IBM Plex Mono", monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    z-index:2;
+  }
+  .scroll-cue .line{width:1px; height:34px; background:linear-gradient(var(--steel-dim), transparent); animation:scrollpulse 1.8s ease-in-out infinite;}
+  @keyframes scrollpulse{0%,100%{opacity:.3;} 50%{opacity:1;}}
+
+  /* ---------- ABOUT ---------- */
+  .about{
+    padding:120px 0 100px;
+    border-top:1px solid var(--line);
+  }
+  .about-grid{
+    display:grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap:60px;
+  }
+  .about h2{
+    font-size:clamp(30px,3.6vw,42px);
+    line-height:1.08;
+    max-width:560px;
+  }
+  .about p{
+    color:var(--steel);
+    font-size:16px;
+    max-width:520px;
+    margin-top:22px;
+  }
+  .spec-card{
+    background:var(--bg-raised);
+    border:1px solid var(--line);
+    padding:26px 24px;
+    align-self:start;
+  }
+  .spec-card .spec-title{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:11.5px;
+    letter-spacing:0.14em;
+    color:var(--steel-dim);
+    text-transform:uppercase;
+    margin-bottom:16px;
+  }
+  .spec-row{
+    display:flex; justify-content:space-between;
+    padding:11px 0;
+    border-top:1px solid var(--line);
+    font-family:"IBM Plex Mono", monospace;
+    font-size:13px;
+  }
+  .spec-row:first-of-type{border-top:none;}
+  .spec-row span:first-child{color:var(--steel-dim);}
+  .spec-row span:last-child{color:var(--cream); text-align:right;}
+
+  /* ---------- CATEGORY SECTIONS ---------- */
+  .category{
+    padding:100px 0;
+    border-top:1px solid var(--line);
+  }
+  .category-head{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:50px;
+    align-items:end;
+    margin-bottom:50px;
+  }
+  .category h2{
+    font-size:clamp(32px,4vw,46px);
+    color:var(--cream);
+  }
+  .category-head p{
+    color:var(--steel);
+    font-size:15.5px;
+    max-width:480px;
+  }
+  .chip{
+    display:inline-flex; align-items:center; gap:8px;
+    margin-top:18px;
+    padding:7px 13px;
+    border:1px solid var(--red);
+    color:var(--red-bright);
+    font-family:"IBM Plex Mono", monospace;
+    font-size:12px;
+    letter-spacing:0.05em;
+  }
+  .chip::before{content:"●"; font-size:8px;}
+
+  .category-banner{
+    position:relative;
+    overflow:hidden;
+    border:1px solid var(--line-strong);
+    margin-bottom:46px;
+    aspect-ratio: 16/6;
+  }
+  .category-banner img{
+    width:100%; height:100%; object-fit:cover;
+    filter:saturate(0.92) contrast(1.04);
+  }
+  .category-banner .banner-overlay{
+    position:absolute; inset:0;
+    background:linear-gradient(100deg, rgba(17,13,12,0.92) 0%, rgba(17,13,12,0.25) 55%, rgba(17,13,12,0.05) 100%);
+  }
+  .category-banner .banner-label{
+    position:absolute; left:28px; bottom:22px;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:12px;
+    letter-spacing:0.1em;
+    color:var(--steel);
+    text-transform:uppercase;
+  }
+
+  .product-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:24px;
+  }
+  .product-card{
+    background:var(--bg-raised);
+    border:1px solid var(--line);
+    transition:border-color .25s ease, transform .25s ease;
+  }
+  .product-card:hover{border-color:var(--red); transform:translateY(-4px);}
+  .product-visual{
+    aspect-ratio:1/0.78;
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      repeating-linear-gradient(135deg, var(--bg-raised-2) 0px, var(--bg-raised-2) 2px, transparent 2px, transparent 14px),
+      linear-gradient(160deg, var(--bg-raised-2), var(--bg-raised));
+    border-bottom:1px solid var(--line);
+  }
+  .product-visual svg{width:54px; height:54px; opacity:0.85;}
+  .product-visual .ph-tag{
+    position:absolute; top:10px; right:10px;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:9.5px;
+    letter-spacing:0.06em;
+    color:var(--steel-dim);
+    text-transform:uppercase;
+    border:1px solid var(--line-strong);
+    padding:3px 7px;
+  }
+  .product-info{padding:18px 18px 20px;}
+  .product-name{font-size:15.5px; color:var(--cream); font-weight:500;}
+  .product-price{
+    margin-top:8px;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:14px;
+    color:var(--copper);
+  }
+  .grid-note{
+    margin-top:22px;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:11.5px;
+    color:var(--steel-dim);
+  }
+
+  /* ---------- CONTACT FORM ---------- */
+  .contact-section{
+    padding:100px 0;
+    border-top:1px solid var(--line);
+    background: linear-gradient(180deg, var(--bg), var(--bg-raised));
+  }
+  .contact-grid{
+    display:grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap:60px;
+  }
+  .contact-info h2{font-size:clamp(32px,4vw,46px); margin-bottom:20px;}
+  .contact-info p{color:var(--steel); font-size:15.5px; max-width:420px;}
+  
+  .custom-form{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+  }
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .form-group label{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:12px;
+    color:var(--steel);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+  .custom-form input, .custom-form textarea{
+    background:var(--bg-raised-2);
+    border:1px solid var(--line-strong);
+    color:var(--cream);
+    padding:14px;
+    font-family:inherit;
+    font-size:15px;
+    transition: border-color 0.25s;
+  }
+  .custom-form input:focus, .custom-form textarea:focus{
+    outline:none;
+    border-color:var(--red-bright);
+  }
+  .form-submit{
+    align-self:flex-start;
+    padding:14px 34px;
+    background:var(--red);
+    color:var(--cream);
+    border:none;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:13.5px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    cursor:pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .form-submit:hover{background:var(--red-deep); transform:translateY(-1px);}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:70px 0 30px;
+    background: var(--bg-raised);
+  }
+  .footer-grid{
+    display:grid;
+    grid-template-columns: 1.2fr 0.8fr 0.8fr;
+    gap:40px;
+    padding-bottom:46px;
+  }
+  footer .logo{margin-bottom:14px;}
+  footer .foot-desc{color:var(--steel); font-size:14.5px; max-width:320px;}
+  .foot-col-title{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:11.5px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--steel-dim);
+    margin-bottom:16px;
+  }
+  .foot-col a{
+    display:block;
+    text-decoration:none;
+    color:var(--steel);
+    font-size:14.5px;
+    margin-bottom:10px;
+    transition:color .2s ease;
+  }
+  .foot-col a:hover{color:var(--red-bright);}
+  .foot-bottom{
+    padding-top:26px;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:24px;
+    font-size:12px;
+    color:var(--steel-dim);
+    border-top:1px solid var(--line);
+  }
+  .foot-bottom .legal{max-width:640px; line-height:1.6;}
+
+  /* Mobile menu active animation */
+  nav.links.open{transform:translateX(0) !important;}
+  .burger.active span:nth-child(1) {transform: translateY(7px) rotate(45deg);}
+  .burger.active span:nth-child(2) {opacity: 0;}
+  .burger.active span:nth-child(3) {transform: translateY(-7px) rotate(-45deg);}
+
+  @media(max-width:880px){
+    nav.links{
+      position:fixed; top:0; right:0; height:100vh; width:72%;
+      background:var(--bg-raised); flex-direction:column;
+      padding:100px 32px; gap:26px; font-size:17px;
+      transform:translateX(100%); transition:transform .3s ease;
+      border-left:1px solid var(--line);
+      z-index: 99;
+    }
+    .burger{display:flex; z-index: 100;}
+    .hero-inner{grid-template-columns:1fr;}
+    .hero-visual{order:-1;}
+    .about-grid{grid-template-columns:1fr;}
+    .category-head{grid-template-columns:1fr;}
+    .product-grid{grid-template-columns:1fr 1fr;}
+    .contact-grid{grid-template-columns:1fr;}
+    .footer-grid{grid-template-columns:1fr;}
+  }
+  @media(max-width:540px){
+    .product-grid{grid-template-columns:1fr;}
+    .category-banner{aspect-ratio:4/5;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+    .reveal{opacity:1; transform:none;}
+  }
+
+  :focus-visible{outline:2px solid var(--red-bright); outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<header class="nav" id="siteNav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="logo"><span class="logo-mark"></span>3D<span>VERDA</span></a>
+    <nav class="links" id="navLinks">
+      <a href="#rolunk">Rólunk</a>
+      <a href="#alkatreszek">Alkatrészek</a>
+      <a href="#kiegeszitok">Kiegészítők</a>
+      <a href="#kepkeretek">Képkeretek</a>
+      <a href="#kapcsolat">Kapcsolat</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Menü"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap hero-inner">
+    <div>
+      <div class="hero-kicker">3D NYOMTATÁS <em>·</em> KÉZMŰVES PONTOSSÁG <em>·</em> MAGYARORSZÁG</div>
+      <h1 class="hero-title">3D<span class="accent">VERDA</span></h1>
+      <p class="hero-motto">„Réteg rétegre, szívvel nyomtatva.”</p>
+      <p class="hero-desc">Egyedi tervezésű, 3D nyomtatott autós alkatrészek, kiegészítők és dísztárgyak — jelenleg Alfa Romeo modellekhez, saját tervezésben, saját kézzel ellenőrizve.</p>
+      <a href="#alkatreszek" class="hero-cta">Termékek megtekintése ↓</a>
+    </div>
+    <div class="hero-visual reveal">
+      <div class="hero-visual-frame">
+        <img src="kezdokep.jpg" width="600" height="400" alt="3DVerda Alfa Romeo formájú 3D nyomtatott képkeret render">
+      </div>
+      <div class="hero-visual-cap">
+        <span>RENDER — KÉPKERET V1</span>
+        <span>SAJÁT TERVEZÉS</span>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>GÖRGESS</span><span class="line"></span></div>
+</section>
+
+<section class="about layerlines" id="rolunk">
+  <div class="wrap about-grid">
+    <div class="reveal">
+      <div class="eyebrow">Rólunk</div>
+      <h2>Két srác, egy nyomtató,<br>és egy közös cél.</h2>
+      <p>Nem vagyunk gyár, és nem vagyunk hivatalos forgalmazó — két srác vagyunk, egy 3D nyomtatóval és egy ötlettel: olyan autós kiegészítőket adni az embereknek, amik nem tömeggyártott bóvlik, hanem tényleg jól néznek ki, és tényleg jól illeszkednek. Minden darabot mi tervezünk, nyomtatunk és ellenőrzünk, kézzel, szívvel-lélekkel, az első réteg leadásától az utolsóig.</p>
+    </div>
+    <div class="spec-card reveal">
+      <div class="spec-title">Műhely-adatlap</div>
+      <div class="spec-row"><span>Csapat</span><span>2 fő</span></div>
+      <div class="spec-row"><span>Technológia</span><span>FDM 3D nyomtatás</span></div>
+      <div class="spec-row"><span>Jelenlegi fókusz</span><span>Alfa Romeo</span></div>
+      <div class="spec-row"><span>Helyszín</span><span>Magyarország</span></div>
+      <div class="spec-row"><span>Minden darab</span><span>Egyedi tervezés</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="category" id="alkatreszek">
+  <div class="wrap">
+    <div class="category-head reveal">
+      <div>
+        <div class="eyebrow">Kategória — Alkatrészek</div>
+        <h2>Alkatrészek</h2>
+      </div>
+      <div>
+        <p>Hőálló anyagokból, FDM technológiával nyomtatjuk az alkatrészeinket, minden darabot a pontos illeszkedésre tervezve — nem „kábé jó”, hanem tényleg passzol.</p>
+        <span class="chip">Jelenleg elérhető: Alfa Romeo modellekhez</span>
+      </div>
+    </div>
+
+    <div class="category-banner reveal">
+      <img src="mehracs.jpg" width="1200" height="450" loading="lazy" alt="3D nyomtatott Alfa Romeo méhrács közelről, render">
+      <div class="banner-overlay"></div>
+      <div class="banner-label">RENDER — MÉHRÁCS RÉSZLET</div>
+    </div>
+
+    <div class="product-grid reveal">
+      <article class="product-card">
+        <div class="product-visual">
+          <span class="ph-tag">Render hamarosan</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="var(--copper)" stroke-width="1.6">
+            <path d="M12 8 L52 8 L58 32 L48 58 L16 58 L6 32 Z"/>
+            <path d="M16 18 L48 18 M14 28 L50 28 M13 38 L51 38 M16 48 L48 48"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Méhrács — elülső</div>
+          <div class="product-price mono">7 900 Ft</div>
+        </div>
+      </article>
+      <article class="product-card">
+        <div class="product-visual">
+          <span class="ph-tag">Render hamarosan</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="var(--copper)" stroke-width="1.6">
+            <rect x="8" y="14" width="48" height="36" rx="2"/>
+            <path d="M14 20 L26 44 M22 20 L34 44 M30 20 L42 44 M38 20 L50 44"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Légbeömlő rácsbetét</div>
+          <div class="product-price mono">4 500 Ft</div>
+        </div>
+      </article>
+      <article class="product-card">
+        <div class="product-visual">
+          <span class="ph-tag">Render hamarosan</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="var(--copper)" stroke-width="1.6">
+            <circle cx="32" cy="32" r="22"/>
+            <circle cx="32" cy="32" r="7"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Embléma-alátét keret</div>
+          <div class="product-price mono">3 200 Ft</div>
+        </div>
+      </article>
+    </div>
+    <div class="grid-note">* Tájékoztató jellegű árak — a végleges árlista a saját gyártási adatok alapján kerül be.</div>
+  </div>
+</section>
+
+<section class="category" id="kiegeszitok">
+  <div class="wrap">
+    <div class="category-head reveal">
+      <div>
+        <div class="eyebrow">Kategória — Kiegészítők</div>
+        <h2>Kiegészítők</h2>
+      </div>
+      <div>
+        <p>Apró dolgok, amik nagy különbséget tesznek a vezetésben — a pohártartótól a telefontartóig, mind a belső térre szabva.</p>
+      </div>
+    </div>
+
+    <div class="category-banner reveal">
+      <img src="pohartarto.jpg" width="1200" height="450" loading="lazy" alt="3D nyomtatott dupla pohártartó beépítve egy autó középkonzolba">
+      <div class="banner-overlay"></div>
+      <div class="banner-label">PÉLDA — DUPLA POHÁRTARTÓ</div>
+    </div>
+
+    <div class="product-grid reveal">
+      <article class="product-card">
+        <div class="product-visual">
+          <span class="ph-tag">Render hamarosan</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="var(--copper)" stroke-width="1.6">
+            <circle cx="22" cy="34" r="14"/>
+            <circle cx="42" cy="34" r="14"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Dupla pohártartó</div>
+          <div class="product-price mono">6 900 Ft</div>
+        </div>
+      </article>
+      <article class="product-card">
+        <div class="product-visual">
+          <span class="ph-tag">Render hamarosan</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="var(--copper)" stroke-width="1.6">
+            <rect x="18" y="8" width="28" height="48" rx="4"/>
+            <path d="M26 50 L38 50"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Telefontartó — konzol</div>
+          <div class="product-price mono">5 400 Ft</div>
+        </div>
+      </article>
+      <article class="product-card">
+        <div class="product-visual">
+          <span class="ph-tag">Render hamarosan</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="var(--copper)" stroke-width="1.6">
+            <rect x="10" y="20" width="44" height="26" rx="3"/>
+            <path d="M10 28 L54 28"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Kártyatartó panel</div>
+          <div class="product-price mono">3 900 Ft</div>
+        </div>
+      </article>
+    </div>
+    <div class="grid-note">* Tájékoztató jellegű árak — a végleges árlista a saját gyártási adatok alapján kerül be.</div>
+  </div>
+</section>
+
+<section class="category" id="kepkeretek">
+  <div class="wrap">
+    <div class="category-head reveal">
+      <div>
+        <div class="eyebrow">Kategória — Képkeretek</div>
+        <h2>Képkeretek</h2>
+      </div>
+      <div>
+        <p>Nem csak dekoráció — egy darab a kedvenc autód formájából, amit kiteszel a falra, vagy ajándékba adsz valakinek, aki ugyanúgy odavan az autókért, mint te.</p>
+      </div>
+    </div>
+
+    <div class="category-banner reveal">
+      <img src="kepkeret.jpg" width="1200" height="450" loading="lazy" alt="Alfa Romeo formájú 3D nyomtatott képkeret, üveg helyén fotóval">
+      <div class="banner-overlay"></div>
+      <div class="banner-label">RENDER — KÉPKERET, FALI KIVITEL</div>
+    </div>
+
+    <div class="product-grid reveal">
+      <article class="product-card">
+        <div class="product-visual">
+          <span class="ph-tag">Render hamarosan</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="var(--copper)" stroke-width="1.6">
+            <path d="M10 10 L54 10 L58 30 L46 56 L18 56 L6 30 Z"/>
+            <path d="M16 20 L48 20 L51 32 L44 48 L20 48 L13 32 Z"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Képkeret — matt fekete</div>
+          <div class="product-price mono">8 900 Ft</div>
+        </div>
+      </article>
+      <article class="product-card">
+        <div class="product-visual">
+          <span class="ph-tag">Render hamarosan</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="var(--red-bright)" stroke-width="1.6">
+            <path d="M10 10 L54 10 L58 30 L46 56 L18 56 L6 30 Z"/>
+            <path d="M16 20 L48 20 L51 32 L44 48 L20 48 L13 32 Z"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Képkeret — racing piros</div>
+          <div class="product-price mono">8 900 Ft</div>
+        </div>
+      </article>
+      <article class="product-card">
+        <div class="product-visual">
+          <span class="ph-tag">Render hamarosan</span>
+          <svg viewBox="0 0 64 64" fill="none" stroke="var(--steel)" stroke-width="1.6">
+            <path d="M10 10 L54 10 L58 30 L46 56 L18 56 L6 30 Z"/>
+            <path d="M16 20 L48 20 L51 32 L44 48 L20 48 L13 32 Z"/>
+          </svg>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Képkeret — egyedi szín</div>
+          <div class="product-price mono">9 900 Ft</div>
+        </div>
+      </article>
+    </div>
+    <div class="grid-note">* Tájékoztató jellegű árak — a végleges árlista a saját gyártási adatok alapján kerül be.</div>
+  </div>
+</section>
+
+<section class="contact-section" id="kapcsolat">
+  <div class="wrap contact-grid">
+    <div class="contact-info reveal">
+      <div class="eyebrow">Kapcsolat</div>
+      <h2>Keress minket</h2>
+      <p>Kérdésed van a kompatibilitással kapcsolatban? Szeretnél egyedi méretet vagy színt? Írj nekünk közvetlenül, és gyorsan válaszolunk.</p>
+    </div>
+    <div class="reveal">
+      <form class="custom-form" action="https://formspree.io/f/xeeblvjv" method="POST">
+        <div class="form-group">
+          <label for="formName">Név</label>
+          <input type="text" id="formName" name="name" required placeholder="pl. Kovács Gábor">
+        </div>
+        <div class="form-group">
+          <label for="formEmail">E-mail cím</label>
+          <input type="email" id="formEmail" name="email" required placeholder="pl. gabor@example.com">
+        </div>
+        <div class="form-group">
+          <label for="formMessage">Üzenet / Egyedi igény</label>
+          <textarea id="formMessage" name="message" rows="5" required placeholder="Milyen autóhoz keresel alkatrészt?"></textarea>
+        </div>
+        <button type="submit" class="form-submit">Üzenet küldése →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="layerlines">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="#top" class="logo"><span class="logo-mark"></span>3D<span style="color:var(--red-bright)">VERDA</span></a>
+        <p class="foot-desc">Kézzel tervezve, réteg rétegre nyomtatva Magyarországon. Két srác, egy nyomtató, egy cél.</p>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Navigáció</div>
+        <a href="#rolunk">Rólunk</a>
+        <a href="#alkatreszek">Alkatrészek</a>
+        <a href="#kiegeszitok">Kiegészítők</a>
+        <a href="#kepkeretek">Képkeretek</a>
+      </div>
+      <div class="foot-col">
+        <div class="foot-col-title">Elérhetőség</div>
+        <a href="mailto:kovacs.mate.0307@gmail.com">kovacs.mate.0307@gmail.com</a>
+        <a href="#">Instagram (hamarosan)</a>
+        <a href="#">Facebook (hamarosan)</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div class="legal">Minden márkanév, embléma és védjegy a jogos tulajdonosát illeti. A 3DVerda független, nem hivatalos rajongói projekt, és nem áll kapcsolatban az Alfa Romeo Automobiles S.p.A.-val vagy a Stellantis csoporttal.</div>
+      <div>© <span id="year"></span> 3DVerda</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // sticky nav background on scroll
+  const navEl = document.getElementById('siteNav');
+  window.addEventListener('scroll', () => {
+    navEl.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // mobile menu toggle with icon transformation
+  const burger = document.getElementById('burger');
+  const navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+    burger.classList.toggle('active');
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    burger.classList.remove('active');
+  }));
+
+  // scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
